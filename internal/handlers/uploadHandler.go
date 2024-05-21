@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"html/template"
 	"io"
 	"mime/multipart"
@@ -62,6 +61,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 		music.MusicFiles = append(music.MusicFiles, dst.Name())
 
-		fmt.Fprintf(w, "File uploaded successfully: %s\n", handler.Filename)
+		http.Redirect(w, r, "/upload", http.StatusSeeOther)
 	}
 }
