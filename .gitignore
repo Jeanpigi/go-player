@@ -102,6 +102,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # folder music
-music
+./music
 
 # End of https://www.toptal.com/developers/gitignore/api/go,linux,macos,windows,dotenv

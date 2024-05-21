@@ -1,10 +1,10 @@
 # Go-Player
 
-Go-Player is a music player that allows users to listen to MP3 and M4A songs, enabling them to play music at any time and from any device.
+Go-Player is a music player that allows users to listen to MP3 songs, enabling them to play music at any time and from any device.
 
 ## Key Features
 
-- Play MP3 and M4A songs at any time and from any device.
+- Play MP3 songs at any time and from any device.
 - Play music using the IAMPlayer program or any other that receives an IP address.
 
 ## Prerequisites

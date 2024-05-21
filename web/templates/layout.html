@@ -1,0 +1,33 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ template "title" . }}</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/"><img src="/static/img/logo.svg" alt="Logo" style="height: 40px;"></a></li>
+                <li><a href="/">Home</a></li>
+                <li><a href="/upload">Upload Music</a></li>
+                <li><a href="/stream">Stream Music</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {{ template "content" . }}
+    </main>
+    <footer>
+        <p>&copy; 2024 Music Streaming Service</p>
+    </footer>
+    <script src="/static/js/scripts.js"></script>
+</body>
+
+</html>
+{{end}}

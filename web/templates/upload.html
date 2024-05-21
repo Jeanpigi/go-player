@@ -1,0 +1,13 @@
+{{ define "title" }}Upload Music{{ end }}
+
+<head>
+    <link rel="stylesheet" type="text/css" href="/static/css/upload.css">
+</head>
+
+{{ define "content" }}
+<h1>Upload Music</h1>
+<form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="musicFile" accept="audio/*" required>
+    <button type="submit">Upload</button>
+</form>
+{{ end }}
