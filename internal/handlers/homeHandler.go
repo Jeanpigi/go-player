@@ -1,15 +1,11 @@
 package handlers
 
 import (
-	"html/template"
 	"net/http"
+
+	"github.com/jeanpigi/go-player/internal/templates"
 )
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("web/templates/layout.html", "web/templates/home.html")
-	if err != nil {
-		http.Error(w, "Error loading template", http.StatusInternalServerError)
-		return
-	}
-	tmpl.ExecuteTemplate(w, "layout", nil)
+	templates.RenderTemplate(w, "web/templates/home.html", nil)
 }

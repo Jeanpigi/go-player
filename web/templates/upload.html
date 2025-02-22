@@ -7,8 +7,10 @@
 
 {{ define "content" }}
 <h1>Upload Music</h1>
-<form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="musicFile" accept="audio/*" required>
-    <button type="submit">Upload</button>
+<form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+    <input id="musicFile" type="file" name="musicFiles" accept="audio/*" multiple required>
+    <button id="submitButton" type="submit">Upload</button>
 </form>
 {{ end }}
+
+

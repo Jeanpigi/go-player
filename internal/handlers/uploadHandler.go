@@ -1,16 +1,19 @@
 package handlers
 
 import (
-	"html/template"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/jeanpigi/go-player/internal/music"
+	"github.com/jeanpigi/go-player/internal/templates"
 )
 
+// isMusicFile verifica si el archivo tiene el MIME type adecuado.
 func isMusicFile(header *multipart.FileHeader) bool {
 	mimeType := header.Header.Get("Content-Type")
 	return mimeType == "audio/mpeg"
@@ -18,49 +21,66 @@ func isMusicFile(header *multipart.FileHeader) bool {
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		tmpl, err := template.ParseFiles("web/templates/layout.html", "web/templates/upload.html")
-		if err != nil {
-			http.Error(w, "Error loading template", http.StatusInternalServerError)
-			return
-		}
 		data := struct {
 			Title string
 		}{
 			Title: "Upload Music",
 		}
-		tmpl.ExecuteTemplate(w, "layout", data)
+		templates.RenderTemplate(w, "web/templates/upload.html", data)
 		return
 	}
 
 	if r.Method == http.MethodPost {
-		r.ParseMultipartForm(10 << 20) // maxMemory 10MB
-		file, handler, err := r.FormFile("musicFile")
+		// Limita el tamaño del formulario a 10MB
+		err := r.ParseMultipartForm(10 << 20)
 		if err != nil {
-			http.Error(w, "Error retrieving file", http.StatusInternalServerError)
-			return
-		}
-		defer file.Close()
-
-		if !isMusicFile(handler) {
-			http.Error(w, "Invalid file type", http.StatusBadRequest)
+			http.Error(w, "Error processing form data", http.StatusBadRequest)
 			return
 		}
 
-		dst, err := os.Create(filepath.Join("./music", handler.Filename))
-		if err != nil {
-			http.Error(w, "Error saving file", http.StatusInternalServerError)
-			return
-		}
-		defer dst.Close()
-
-		_, err = io.Copy(dst, file)
-		if err != nil {
-			http.Error(w, "Error saving file", http.StatusInternalServerError)
+		// Obtener todos los archivos subidos con la key "musicFiles"
+		files := r.MultipartForm.File["musicFiles"]
+		if len(files) == 0 {
+			http.Error(w, "No files uploaded", http.StatusBadRequest)
 			return
 		}
 
-		music.MusicFiles = append(music.MusicFiles, dst.Name())
+		// Itera sobre cada archivo
+		for _, fileHeader := range files {
+			file, err := fileHeader.Open()
+			if err != nil {
+				http.Error(w, "Error retrieving file", http.StatusInternalServerError)
+				return
+			}
+			defer file.Close()
 
+			// Valida el tipo MIME
+			if !isMusicFile(fileHeader) {
+				http.Error(w, "Invalid file type", http.StatusBadRequest)
+				return
+			}
+
+			// Sanitiza el nombre y agrega un prefijo con timestamp
+			filename := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filepath.Base(fileHeader.Filename))
+			dstPath := filepath.Join("./music", filename)
+			dst, err := os.Create(dstPath)
+			if err != nil {
+				http.Error(w, "Error saving file", http.StatusInternalServerError)
+				return
+			}
+			defer dst.Close()
+
+			_, err = io.Copy(dst, file)
+			if err != nil {
+				http.Error(w, "Error saving file", http.StatusInternalServerError)
+				return
+			}
+
+			// Agrega la ruta del archivo a la lista en memoria
+			music.MusicFiles = append(music.MusicFiles, dst.Name())
+		}
+
+		// Redirige a la misma página después del POST para evitar reenvío de formulario
 		http.Redirect(w, r, "/upload", http.StatusSeeOther)
 	}
 }
